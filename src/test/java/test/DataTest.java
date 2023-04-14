@@ -22,12 +22,12 @@ public class DataTest {
 
     @Test
     @DisplayName("Should successful plan and replan meeting")
-    void shouldSuccessfulPlanAndReplanMeeting() {
+        void dSuccessfulPlanAndReplanMeeting() {
         var validUser = DataGenerator.Registration.generateUser("ru");
-        var daysToAddForFirstMeeting = 4;
-        var firstMeetingDate = DataGenerator.generateDate(daysToAddForFirstMeeting);
-        var daysToAddForSecondMeeting = 6;
-        var secondMeetingDate = DataGenerator.generateDate(daysToAddForSecondMeeting);
+        var daysFirstMeeting = 4;
+        var firstMeetingDate = DataGenerator.generateDate(daysFirstMeeting);
+        var daysSecondMeeting = 6;
+        var secondMeetingDate = DataGenerator.generateDate(daysSecondMeeting);
         $("[data-test-id='city'] input").setValue(validUser.getCity());
         $("[data-test-id='date'] input").doubleClick();
         $("[data-test-id='date'] input").sendKeys(Keys.DELETE);
