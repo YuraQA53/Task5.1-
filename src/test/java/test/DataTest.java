@@ -1,51 +1,102 @@
 package test;
 
-import com.codeborne.selenide.Condition;
 import com.codeborne.selenide.Configuration;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.Keys;
+import data.DataGenerator;
+import data.RegistrationByCardInfo;
+
 import java.time.Duration;
 
-import data.DataGenerator;
-
+import static com.codeborne.selenide.Condition.exactText;
+import static com.codeborne.selenide.Condition.visible;
+import static com.codeborne.selenide.Selectors.byText;
 import static com.codeborne.selenide.Selenide.*;
+
 public class DataTest {
+    RegistrationByCardInfo user = DataGenerator.Registration.generateByCard("ru");
+    String afterThreeDays = DataGenerator.Registration.generateDate(4);
+    String inFiveDays = DataGenerator.Registration.generateDate(6);
+
     @BeforeEach
-    void setup() {
+    void setUp() {
         Configuration.headless = true;
         Configuration.holdBrowserOpen = true;
-        open("http://localhost:9999");
-
+        open("http://localhost:9999/");
     }
 
     @Test
-    @DisplayName("Should successful plan and replan meeting")
-        void dSuccessfulPlanAndReplanMeeting() {
-        var validUser = DataGenerator.Registration.generateUser("ru");
-        var daysFirstMeeting = 4;
-        var firstMeetingDate = DataGenerator.generateDate(daysFirstMeeting);
-        var daysSecondMeeting = 6;
-        var secondMeetingDate = DataGenerator.generateDate(daysSecondMeeting);
-        $("[data-test-id='city'] input").setValue(validUser.getCity());
-        $("[data-test-id='date'] input").doubleClick();
-        $("[data-test-id='date'] input").sendKeys(Keys.DELETE);
-        $("[data-test-id='date'] input").setValue(firstMeetingDate);
-        $("[data-test-id='name'] input").setValue(validUser.getName());
-        $("[data-test-id='phone'] input").setValue(validUser.getPhone());
-        $("[data-test-id=agreement]").click();
-        $$("button").find(Condition.exactText("Запланировать")).click();
-        $("[data-test-id='success-notification']").shouldBe(Condition.visible, Duration.ofSeconds(15));
-        $(".notification__content").shouldHave(Condition.ownText(firstMeetingDate));
-        $("[data-test-id='date'] input").doubleClick();
-        $("[data-test-id='date'] input").sendKeys(Keys.DELETE);
-        $("[data-test-id='date'] input").setValue(secondMeetingDate);
-        $$("button").find(Condition.exactText("Запланировать")).click();
-        $("[data-test-id='replan-notification'] button").click();
-        $("[data-test-id='success-notification']").shouldBe(Condition.visible, Duration.ofSeconds(15));
-        $(".notification__content").shouldHave(Condition.ownText(secondMeetingDate));
+    void submitCorrectForm() {
+        $("[data-test-id='city'] input").setValue(user.getCity());
+        $("[data-test-id='date'] input").doubleClick().sendKeys(Keys.BACK_SPACE);
+        $("[data-test-id='date'] input").setValue(afterThreeDays);
+        $("[data-test-id='name'] input").setValue(user.getName());
+        $("[data-test-id='phone'] input").setValue(user.getNumber());
+        $("[data-test-id='agreement']").click();
+        $$("button").find(exactText("Запланировать")).click();
+        $(byText("Успешно!")).shouldBe(visible, Duration.ofSeconds(15));
+        $(".notification__content").shouldHave(exactText("Встреча успешно запланирована на " + afterThreeDays));
+        $("[data-test-id='date'] input").doubleClick().sendKeys(Keys.BACK_SPACE);
+        $("[data-test-id='date'] input").setValue(inFiveDays);
+        $$("button").find(exactText("Запланировать")).click();
+        $$(".button__text").find(exactText("Перепланировать")).click();
+        $(byText("Успешно!")).shouldBe(visible, Duration.ofSeconds(15));
+        $(".notification__content").shouldHave(exactText("Встреча успешно запланирована на " + inFiveDays));
+    }
+
+    @Test
+    void requestWithoutCity() {
+        $("[data-test-id='date'] input").doubleClick().sendKeys(Keys.BACK_SPACE);
+        $("[data-test-id='date'] input").setValue(afterThreeDays);
+        $("[data-test-id='name'] input").setValue(user.getName());
+        $("[data-test-id='phone'] input").setValue(user.getNumber());
+        $("[data-test-id='agreement']").click();
+        $$("button").find(exactText("Запланировать")).click();
+        $(".input__sub").shouldHave(exactText("Поле обязательно для заполнения"));
+    }
+
+    @Test
+    void requestWithoutDate() {
+        $("[data-test-id='city'] input").setValue(user.getCity());
+        $("[data-test-id='date'] input").doubleClick().sendKeys(Keys.BACK_SPACE);
+        $("[data-test-id='name'] input").setValue(user.getName());
+        $("[data-test-id='phone'] input").setValue(user.getNumber());
+        $("[data-test-id='agreement']").click();
+        $$("button").find(exactText("Запланировать")).click();
+        $(".input_invalid .input__sub").shouldHave(exactText("Неверно введена дата"));
+    }
+
+    @Test
+    void requestWithoutName() {
+        $("[data-test-id='city'] input").setValue(user.getCity());
+        $("[data-test-id='date'] input").doubleClick().sendKeys(Keys.BACK_SPACE);
+        $("[data-test-id='date'] input").setValue(afterThreeDays);
+        $("[data-test-id='phone'] input").setValue(user.getNumber());
+        $("[data-test-id='agreement']").click();
+        $$("button").find(exactText("Запланировать")).click();
+        $(".input_invalid .input__sub").shouldHave(exactText("Поле обязательно для заполнения"));
+    }
+
+    @Test
+    void requestWithoutNumber() {
+        $("[data-test-id='city'] input").setValue(user.getCity());
+        $("[data-test-id='date'] input").doubleClick().sendKeys(Keys.BACK_SPACE);
+        $("[data-test-id='date'] input").setValue(afterThreeDays);
+        $("[data-test-id='name'] input").setValue(user.getName());
+        $("[data-test-id='agreement']").click();
+        $$("button").find(exactText("Запланировать")).click();
+        $(".input_invalid .input__sub").shouldHave(exactText("Поле обязательно для заполнения"));
+    }
+
+    @Test
+    void requestWithoutAgreement() {
+        $("[data-test-id='city'] input").setValue(user.getCity());
+        $("[data-test-id='date'] input").doubleClick().sendKeys(Keys.BACK_SPACE);
+        $("[data-test-id='date'] input").setValue(afterThreeDays);
+        $("[data-test-id='name'] input").setValue(user.getName());
+        $("[data-test-id='phone'] input").setValue(user.getNumber());
+        $$("button").find(exactText("Запланировать")).click();
+        $(".input_invalid .checkbox__text").shouldHave(exactText("Я соглашаюсь с условиями обработки и использования моих персональных данных"));
     }
 }
-
-
