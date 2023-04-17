@@ -66,7 +66,7 @@ public class DataTest {
         $$("button").find(exactText("Запланировать")).click();
         $(".input_invalid .input__sub").shouldHave(exactText("Неверно введена дата"));
     }
-    
+
 
     @Test
     void requestWithoutNumber() {
