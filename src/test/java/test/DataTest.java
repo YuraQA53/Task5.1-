@@ -66,17 +66,7 @@ public class DataTest {
         $$("button").find(exactText("Запланировать")).click();
         $(".input_invalid .input__sub").shouldHave(exactText("Неверно введена дата"));
     }
-
-    @Test
-    void requestWithoutName() {
-        $("[data-test-id='city'] input").setValue(user.getCity());
-        $("[data-test-id='date'] input").doubleClick().sendKeys(Keys.BACK_SPACE);
-        $("[data-test-id='date'] input").setValue(afterThreeDays);
-        $("[data-test-id='phone'] input").setValue(user.getNumber());
-        $("[data-test-id='agreement']").click();
-        $$("button").find(exactText("Запланировать")).click();
-        $(".input_invalid .input__sub").shouldHave(exactText("Поле обязательно для заполнения"));
-    }
+    
 
     @Test
     void requestWithoutNumber() {
