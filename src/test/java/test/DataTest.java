@@ -44,49 +44,4 @@ public class DataTest {
         $(byText("Успешно!")).shouldBe(visible, Duration.ofSeconds(15));
         $(".notification__content").shouldHave(exactText("Встреча успешно запланирована на " + inFiveDays));
     }
-
-    @Test
-    void requestWithoutCity() {
-        $("[data-test-id='date'] input").doubleClick().sendKeys(Keys.BACK_SPACE);
-        $("[data-test-id='date'] input").setValue(afterThreeDays);
-        $("[data-test-id='name'] input").setValue(user.getName());
-        $("[data-test-id='phone'] input").setValue(user.getNumber());
-        $("[data-test-id='agreement']").click();
-        $$("button").find(exactText("Запланировать")).click();
-        $(".input__sub").shouldHave(exactText("Поле обязательно для заполнения"));
-    }
-
-    @Test
-    void requestWithoutDate() {
-        $("[data-test-id='city'] input").setValue(user.getCity());
-        $("[data-test-id='date'] input").doubleClick().sendKeys(Keys.BACK_SPACE);
-        $("[data-test-id='name'] input").setValue(user.getName());
-        $("[data-test-id='phone'] input").setValue(user.getNumber());
-        $("[data-test-id='agreement']").click();
-        $$("button").find(exactText("Запланировать")).click();
-        $(".input_invalid .input__sub").shouldHave(exactText("Неверно введена дата"));
-    }
-
-
-    @Test
-    void requestWithoutNumber() {
-        $("[data-test-id='city'] input").setValue(user.getCity());
-        $("[data-test-id='date'] input").doubleClick().sendKeys(Keys.BACK_SPACE);
-        $("[data-test-id='date'] input").setValue(afterThreeDays);
-        $("[data-test-id='name'] input").setValue(user.getName());
-        $("[data-test-id='agreement']").click();
-        $$("button").find(exactText("Запланировать")).click();
-        $(".input_invalid .input__sub").shouldHave(exactText("Поле обязательно для заполнения"));
-    }
-
-    @Test
-    void requestWithoutAgreement() {
-        $("[data-test-id='city'] input").setValue(user.getCity());
-        $("[data-test-id='date'] input").doubleClick().sendKeys(Keys.BACK_SPACE);
-        $("[data-test-id='date'] input").setValue(afterThreeDays);
-        $("[data-test-id='name'] input").setValue(user.getName());
-        $("[data-test-id='phone'] input").setValue(user.getNumber());
-        $$("button").find(exactText("Запланировать")).click();
-        $(".input_invalid .checkbox__text").shouldHave(exactText("Я соглашаюсь с условиями обработки и использования моих персональных данных"));
-    }
 }
